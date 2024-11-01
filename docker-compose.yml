@@ -1,0 +1,16 @@
+services:
+  tor:
+    image: dockurr/tor
+    container_name: tor
+    hostname: tor
+    pull_policy: always
+    ports:
+      - 9050:9050
+      - 9051:9051
+    volumes:
+      - "/var/lib/srv/${USER}/docker/dockurr/tor/latest/rootfs/config/tor:/etc/tor"
+      - "/var/lib/srv/${USER}/docker/dockurr/tor/latest/rootfs/data/tor:/var/lib/tor"
+    stop_grace_period: 1m
+
+networks:
+  tor:
