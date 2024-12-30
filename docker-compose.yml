@@ -1,0 +1,54 @@
+name: tor
+services:
+  server:
+    image: fphammerle/tor-proxy:4.5.1-tor0.4.8.4r0
+    container_name: tor
+    hostname: tor
+    restart: always
+    pull_policy: always
+    privileged: true
+    environment:
+      - SOCKS_TIMEOUT_SECONDS=30
+    ports:
+      - '9040:9040/tcp'
+      - '9050:9050/tcp'
+      - '9051:9051/tcp'
+      - '9053:9053/udp'
+    volumes:
+      - type: volume
+        source: tor
+        target: /var/lib/tor
+        read_only: false
+    networks:
+      - tor
+
+  bridge:
+    image: thetorproject/obfs4-bridge:latest
+    container_name: bridge
+    hostname: bridge
+    restart: always
+    pull_policy: always
+    privileged: true
+    environment:
+      - OR_PORT=8444
+      - PT_PORT=8445
+      - OBFS4V_AddressDisableIPv6=0
+      - OBFS4_ENABLE_ADDITIONAL_VARIABLES=1
+      - EMAIL=tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
+      - NICKNAME=${APP_ORG_NAME:-DockerObfs4Bridge}
+    volumes:
+      - bridge:/var/lib/tor
+    ports:
+      - '8444:8444'
+      - '8445:8445'
+    networks:
+      - tor
+
+volumes:
+  tor:
+  bridge:
+
+networks:
+  tor:
+    name: tor
+    external: false
