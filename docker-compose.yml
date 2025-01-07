@@ -17,7 +17,7 @@ services:
       - TOR_RELAY_PORT=57000
       - TOR_RELAY_OR_PORT=57001
       - TOR_RELAY_DIR_PORT=5702
-      - TOR_RELAY_ACCOUNT_MAX='1000 GBytes'
+      - 'TOR_RELAY_ACCOUNT_MAX=1000 GBytes'
       - TOR_RELAY_NICK_NAME=CasjaysDevRelayServer
       - TOR_RELAY_ADMIN=tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
       - TOR_BRIDGE_PT_PORT=57003
@@ -25,7 +25,7 @@ services:
       - TOR_BRIDGE_DIR_PORT=57005
       - TOR_BRIDGE_NICK_NAME=CasjaysDev
       - TOR_BRIDGE_ADMIN=tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
-      - TOR_BRIDGE_ACCOUNT_MAX='1000 GBytes'
+      - 'TOR_BRIDGE_ACCOUNT_MAX=1000 GBytes'
     ports:
       - '8118:8118/tcp'
       - '9040:9040/tcp'
