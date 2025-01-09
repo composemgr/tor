@@ -30,11 +30,11 @@ services:
       - '8118:8118/tcp'
       - '9040:9040/tcp'
       - '9050:9050/tcp'
+      - '9051:9051/tcp'
       - '9053:9053/tcp'
       - '9053:9053/udp'
       - '57000-57005:57000-57005/tcp'
       - '57000-57005:57000-57005/udp'
-      - '127.0.0.1:9051:9051/tcp' 
     volumes:
       - /var/lib/srv/${USER}/docker/casjaysdevdocker/tor/latest/data:/data
       - /var/lib/srv/${USER}/docker/casjaysdevdocker/tor/latest/config:/config
