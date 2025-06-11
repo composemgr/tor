@@ -20,6 +20,7 @@ services:
       - 'TOR_RELAY_ENABLED=yes'
       - 'TOR_BRIDGE_ENABLED=yes'
       - 'TOR_HIDDEN_ENABLED=yes'
+      - 'DEFAULT_ONION_SITE=${DEFAULT_ONION_SITE:-}'
       - 'TOR_SOCKS_SAFE=0'
       - 'TOR_SOCKS_TIMEOUT=30'
       - 'TOR_RELAY_PORT=57000'
