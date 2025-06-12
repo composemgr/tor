@@ -51,9 +51,9 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'cloudflare.enable=true'
-      - 'cloudflare.hostname=tor.${CLOUDFLARE_DOMAIN}'
-      - 'cloudflare.service=http://tor-app:80'
       - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://tor-app:80'
+      - 'cloudflare.hostname=tor.${CLOUDFLARE_ZONE_NAME}'
       - 'traefik.http.routers.tor-app.entrypoints=http'
       - 'traefik.http.routers.tor-app-secure.tls=true'
       - 'traefik.http.routers.tor-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
