@@ -1,0 +1,79 @@
+# nginx proxy address - http://172.17.0.1:61025
+
+name: tor
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: casjaysdevdocker/tor:latest
+    container_name: tor-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TOR_DNS_ENABLED: yes
+      TOR_RELAY_ENABLED: yes
+      TOR_BRIDGE_ENABLED: yes
+      TOR_HIDDEN_ENABLED: yes
+      TOR_SOCKS_SAFE: 0
+      TOR_SOCKS_TIMEOUT: 30
+      TOR_RELAY_PORT: 57000
+      TOR_RELAY_OR_PORT: 57001
+      TOR_RELAY_DIR_PORT: 57002
+      TOR_RELAY_ACCOUNT_MAX: 1000 GBytes
+      TOR_RELAY_NICK_NAME: CasjaysDevRelay
+      TOR_RELAY_ADMIN: tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
+      TOR_BRIDGE_PT_PORT: 57003
+      TOR_BRIDGE_OR_PORT: 57004
+      TOR_BRIDGE_DIR_PORT: 57005
+      TOR_BRIDGE_NICK_NAME: CasjaysDevBridge
+      TOR_BRIDGE_ADMIN: tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
+      TOR_BRIDGE_ACCOUNT_MAX: 1000 GBytes
+      DEFAULT_ONION_SITE: ${DEFAULT_ONION_SITE:-}
+    ports:
+      - '8118:8118/tcp'
+      - '9040:9040/tcp'
+      - '9050:9050/tcp'
+      - '9051:9051/tcp'
+      - '9053:9053/tcp'
+      - '9053:9053/udp'
+      - '57000-57005:57000-57005/tcp'
+      - '57000-57005:57000-57005/udp'
+      - '172.17.0.1:61025:80/tcp'
+    volumes:
+      - './rootfs/data:/data:z'
+      - './rootfs/config:/config:z'
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://tor-app:80'
+      - 'cloudflare.hostname=tor.${CLOUDFLARE_ZONE_NAME}'
+      - 'traefik.http.routers.tor-app.entrypoints=http'
+      - 'traefik.http.routers.tor-app-secure.tls=true'
+      - 'traefik.http.routers.tor-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.tor-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.tor-app.middlewares=tor-app-https-redirect'
+      - 'traefik.http.routers.tor-app-secure.entrypoints=https'
+      - 'traefik.http.routers.tor-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.tor-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.tor-app-secure.service=tor-app'
+      - 'traefik.http.services.tor-app.loadbalancer.server.port=80'
+    networks:
+      - tor
+      - proxy
+      - cloudflare
+
+networks:
+  tor:
+    name: tor
+    external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
