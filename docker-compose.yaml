@@ -61,8 +61,8 @@ services:
       - '57000-57007:57000-57007/udp'
       - '172.17.0.1:61025:80/tcp'
     volumes:
-      - './rootfs/data:/data:z'
-      - './rootfs/config:/config:z'
+      - './volumes/data:/data:z'
+      - './volumes/config:/config:z'
     cap_add:
       - SYS_TIME
       - SYS_NICE
