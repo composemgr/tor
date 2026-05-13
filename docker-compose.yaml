@@ -50,6 +50,8 @@ services:
       TOR_EXIT_DIR_PORT: 57007
       TOR_EXIT_NICK_NAME: CasjaysDevExit
       TOR_EXIT_ADMIN: tor-admin@${BASE_HOST_NAME:-$HOSTNAME}
+      CONTAINER_NAME: tor-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
       - '8118:8118/tcp'
       - '9040:9040/tcp'
@@ -67,10 +69,32 @@ services:
       - SYS_TIME
       - SYS_NICE
       - NET_ADMIN
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://tor-app:80'
+      - 'cloudflare.hostname=tor.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.tor-app.entrypoints=http'
+      - 'traefik.http.routers.tor-app-secure.tls=true'
+      - 'traefik.http.routers.tor-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.tor-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.tor-app.middlewares=tor-app-https-redirect'
+      - 'traefik.http.routers.tor-app-secure.entrypoints=https'
+      - 'traefik.http.routers.tor-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.tor-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.tor-app-secure.service=tor-app'
+      - 'traefik.http.services.tor-app.loadbalancer.server.port=80'
     networks:
       - tor
+      - proxy
+      - cloudflare
 
 networks:
   tor:
     name: tor
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
